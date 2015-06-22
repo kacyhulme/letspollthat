@@ -59,9 +59,9 @@ app.get('/letspollthat', readHandler);
 function updateHandler(req, res) {
   var results = [];
   var id = req.params.poll_id;
-  var data = {question: req.body.question};
+  var data = {question: req.body.question, option_one: req.body.option_one, option_two: req.body.option_two, option_three: req.body.option_three, option_four: req.body.option_four, votes: req.body.votes};
   pg.connect(connectionString, function(err,client,done) {
-    client.query("UPDATE polls SET question=($1) WHERE id=($2)", [data.question, id]);
+    client.query("UPDATE polls SET question=($1), option_one=($2), option_two=($3), option_three=($4), option_four=($5), votes=($6) WHERE id=($7)", [data.question, data.option_one, data.option_two, data.option_three, data.option_four, data.votes, id]);
     var query = client.query("SELECT * FROM polls ORDER BY id ASC");
     query.on('row', function(row) {
       results.push(row);
