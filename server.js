@@ -78,9 +78,27 @@ function updateHandler(req, res) {
 app.put('/letspollthat/:poll_id', updateHandler);
 
 
-//DESTROY//////////////
-
-
+//DELETE//////////////
+function deleteHandler(req, res) {
+  var results = [];
+  var id = req.params.poll_id;
+  pg.connect(connectionString, function(err, client, done) {
+    client.query("DELETE FROM polls WHERE id=($1)", [id]);
+    var query = client.query("SELECT * FROM polls ORDER BY id ASC");
+    query.on('row', function(row) {
+      results.push(row);
+    });
+    query.on('end', function() {
+      client.end();
+      return res.json(results);
+    });
+    if(err) {
+      console.log(err);
+    }
+  });
+}
+app.delete('/letspollthat/:poll_id', deleteHandler);
+//////////////////////
 
 app.listen(port, function() {
   console.log('App is running on http://localhost: ' +port);
