@@ -15,6 +15,7 @@ app.get('/', function(req, res) {
   res.render('index');
 });
 
+//CREATE//////////////
 function postHandler(req, res) {
   var results = [];
   var data = {question: req.body.question};
@@ -33,8 +34,53 @@ function postHandler(req, res) {
     }
   });
 }
-
 app.post('/letspollthat', postHandler);
+
+//READ//////////////
+function readHandler(req, res) {
+  var results = [];
+  pg.connect(connectionString, function(err, client, done) {
+    var query = client.query("SELECT * FROM polls ORDER BY id ASC;");
+    query.on('row', function(row) {
+      results.push(row);
+    });
+    query.on('end', function() {
+      client.end();
+      return res.json(results);
+    });
+    if(err) {
+      console.log(err);
+    }
+  });
+}
+app.get('/letspollthat', readHandler);
+
+//UPDATE//////////////
+function updateHandler(req, res) {
+  var results = [];
+  var id = req.params.poll_id;
+  var data = {question: req.body.question};
+  pg.connect(connectionString, function(err,client,done) {
+    client.query("UPDATE polls SET question=($1) WHERE id=($2)", [data.question, id]);
+    var query = client.query("SELECT * FROM polls ORDER BY id ASC");
+    query.on('row', function(row) {
+      results.push(row);
+    });
+    query.on('end', function() {
+      client.end();
+      return res.json(results);
+    });
+    if(err) {
+      console.log(err);
+    }
+  });
+}
+app.put('/letspollthat/:poll_id', updateHandler);
+
+
+//DESTROY//////////////
+
+
 
 app.listen(port, function() {
   console.log('App is running on http://localhost: ' +port);
