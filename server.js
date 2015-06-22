@@ -18,9 +18,9 @@ app.get('/', function(req, res) {
 //CREATE//////////////
 function postHandler(req, res) {
   var results = [];
-  var data = {question: req.body.question};
+  var data = {question: req.body.question, option_one: req.body.option_one, option_two: req.body.option_two, option_three: req.body.option_three, option_four: req.body.option_four, votes: req.body.votes};
   pg.connect(connectionString, function(err, client, done) {
-    client.query("INSERT INTO polls(question) values($1)", [data.question]);
+    client.query("INSERT INTO polls(question, option_one, option_two, option_three, option_four, votes) values($1, $2, $3, $4, $5, $6)", [data.question, data.option_one, data.option_two, data.option_three, data.option_four, data.votes]);
     var query = client.query("SELECT * FROM polls ORDER BY id ASC");
     query.on('row', function(row) {
       results.push(row);
