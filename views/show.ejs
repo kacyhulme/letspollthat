@@ -1,0 +1,10 @@
+<div>Hello!</div>
+<div><%= question %></div>
+
+<form method="update" action="/update" id="voteform">
+  <input type="radio" name="first_choice"><%= option_one %>
+  <input type="radio" name="second_choice"><%= option_two%>
+  <input type="radio" name="third_choice"><%= option_three %>
+  <input type="radio" name="fourth_choice"><%= option_four %>
+  <input id="button" type="submit" value="Vote" class="btn btn-primary btn-sm">
+</form>

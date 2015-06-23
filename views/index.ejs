@@ -12,22 +12,22 @@
 
   <div class="container">
     <div class="jumbotron">
-      <h1>Let's poll that!</h1>
+      <h1 class="h1">Let's poll that!</h1>
       <p>A simple polling app created using node.js and express</p>
       <hr>
-      <p>
-        <input type="text" name="pollquestion" placeholder="Type question here">
-      </p>
-      <form>
-        <input type="text" placeholder="Enter a Poll Option"><br>
-        <input type="text" placeholder="Enter a Poll Option"><br>
-        <input type="text" placeholder="Enter a Poll Option"><br>
-        <input type="text" placeholder="Enter a Poll Option"><br>
-        <input type="submit" value="Submit" class="btn btn-primary btn-sm">
+      <form method="post" action="/create" id="pollform">
+        <p>
+          <input id="pollquestion" name="question" placeholder="Type question here">
+        </p>
+        <input name="option_one" placeholder="Enter a Poll Option"><br>
+        <input name= "option_two" placeholder="Enter a Poll Option"><br>
+        <input name= "option_three" placeholder="Enter a Poll Option"><br>
+        <input name= "option_four" placeholder="Enter a Poll Option"><br>
+        <input id="button" type="submit" value="Submit" class="btn btn-primary btn-sm">
       </form>
     </div>
   </div>
 
-  <script src="js/index.js" type="text/javascript" charset="utf-8"></script>
+  <script src="js/main.js" type="text/javascript" charset="utf-8"></script>
 </body>
 </html>
