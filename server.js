@@ -13,10 +13,12 @@ app.use(express.static(__dirname + '/public'));
 app.get('/', function(req, res) {
   res.render('index')
 });
-
+app.get('/thanks', function(req, res) {
+  res.render('thanks')
+});
 app.post('/create', createHandler); //CREATE
 app.get('/show/:poll_id', showHandler); //READ
-app.put('/update/:poll_id', updateHandler); //UPDATE
+app.post('/update', updateHandler); //UPDATE
 app.delete('/letspollthat/:poll_id', deleteHandler); //DELETE
 
 app.listen(port, function() {
@@ -41,10 +43,11 @@ function createHandler(req, res) {
     var query = client.query("INSERT INTO polls (question) values ($1) RETURNING poll_id", [data.question], function(err, result) {
       console.log(result);
       var new_poll_id = result.rows[0].poll_id;
-      client.query("INSERT INTO poll_options(option_text, poll_id) values ($1, $2)", [data.option_one, new_poll_id]);
-      client.query("INSERT INTO poll_options(option_text, poll_id) values ($1, $2)", [data.option_two, new_poll_id]);
-      client.query("INSERT INTO poll_options(option_text, poll_id) values ($1, $2)", [data.option_three, new_poll_id]);
-      client.query("INSERT INTO poll_options(option_text, poll_id) values ($1, $2)", [data.option_four, new_poll_id]);
+      var prepStmt = "INSERT INTO poll_options(option_text, poll_id, votes) values ($1, $2, $3)";
+      client.query(prepStmt, [data.option_one, new_poll_id, 0]);
+      client.query(prepStmt, [data.option_two, new_poll_id, 0]);
+      client.query(prepStmt, [data.option_three, new_poll_id, 0]);
+      client.query(prepStmt, [data.option_four, new_poll_id, 0]);
       res.redirect('/show/' + new_poll_id);
     });
   });
@@ -56,20 +59,23 @@ function showHandler(req, res) {
   pg.connect(connectionString, function(err, client, done) {
     if(err) throw err;
 
-    var query = client.query("SELECT polls.question, poll_options.* FROM polls JOIN poll_options ON polls.poll_id = poll_options.poll_id WHERE polls.poll_id=$1", [req.params.poll_id]);
-    
+    var query = client.query("SELECT polls.question, poll_options.option_text, poll_options.poll_option_id FROM polls JOIN poll_options ON polls.poll_id = poll_options.poll_id WHERE polls.poll_id=$1", [req.params.poll_id]);   
     query.on('row', function(row) {
       results.push(row);
     });
     
-    query.on('end', function(result) {
+    query.on('end', function(_) {
       client.end();
       res.render('show', {
-        question: result.rows[0].question,
-        option_one: result.rows[0].option_text,
-        option_two: result.rows[0].option_text,
-        option_three: result.rows[0].option_text,
-        option_four: result.rows[0].option_text,
+        question: results[0].question,
+        option_one: results[0].option_text,
+        option_one_val: results[0].poll_option_id,
+        option_two: results[1].option_text,
+        option_two_val: results[1].poll_option_id,
+        option_three: results[2].option_text,
+        option_three_val: results[2].poll_option_id,
+        option_four: results[3].option_text,
+        option_four_val: results[3].poll_option_id
       });
     });
   });
@@ -78,19 +84,19 @@ function showHandler(req, res) {
 //UPDATE//
 function updateHandler(req, res) {
   var results = [];
-  var id = req.params.poll_id;
-  var data = {question: req.body.question, option_one: req.body.option_one, option_two: req.body.option_two, option_three: req.body.option_three, option_four: req.body.option_four, votes: req.body.votes};
-  pg.connect(connectionString, function(err,client,done) {
+
+  pg.connect(connectionString, function(err, client, done) {
     if(err) throw err;
-    client.query("UPDATE polls SET question=($1), option_one=($2), option_two=($3), option_three=($4), option_four=($5), votes=($6) WHERE id=($7)", [data.question, data.option_one, data.option_two, data.option_three, data.option_four, data.votes, id]);
-    var query = client.query("SELECT * FROM polls ORDER BY id ASC");
-    query.on('row', function(row) {
-      results.push(row);
-    });
-    query.on('end', function() {
-      client.end();
-      return res.json(results);
-    });
+    client.query("UPDATE poll_options SET votes = votes + 1 WHERE poll_option_id=($1)", [req.body.selected]);
+    res.redirect('/thanks');
+    // var query = client.query("SELECT * FROM polls ORDER BY id ASC");
+    // query.on('row', function(row) {
+    //   results.push(row);
+    // });
+    // query.on('end', function() {
+    //   client.end();
+    //   return res.json(results);
+    // });
   });
 }
 
