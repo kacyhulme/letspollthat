@@ -15,8 +15,13 @@ body {
 .btn {
   background-color: #D46A6A;
   border: none;
+  margin-left: 15px;
 }
 
 .btn:hover {  
   background-color: #AA3939;
+}
+
+input[type=checkbox], input[type=radio] {
+  margin: 10px 10px;
 }
