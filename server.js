@@ -15,7 +15,7 @@ app.get('/', function(req, res) {
 });
 
 app.post('/create', createHandler); //CREATE
-app.get('/show/:id', showHandler); //READ
+app.get('/show/:poll_id', showHandler); //READ
 app.put('/update/:poll_id', updateHandler); //UPDATE
 app.delete('/letspollthat/:poll_id', deleteHandler); //DELETE
 
@@ -28,20 +28,25 @@ app.listen(port, function() {
 function createHandler(req, res) {
   var results = [];
   var data = {
-    question: req.body.question, 
+    question: req.body.question,
     option_one: req.body.option_one, 
     option_two: req.body.option_two, 
     option_three: req.body.option_three, 
-    option_four: req.body.option_four, 
-    votes: req.body.votes
+    option_four: req.body.option_four
   };
   pg.connect(connectionString, function(err, client, done) {
     if(err) {
       console.log(err);
     }
-    client.query("INSERT INTO polls(question, option_one, option_two, option_three, option_four, votes) values ($1, $2, $3, $4, $5, $6)", [data.question, data.option_one, data.option_two, data.option_three, data.option_four, data.votes]);
-    ///FIXME
-    res.redirect('/show/6');
+    var query = client.query("INSERT INTO polls (question) values ($1) RETURNING poll_id", [data.question], function(err, result) {
+      console.log(result);
+      var new_poll_id = result.rows[0].poll_id;
+      client.query("INSERT INTO poll_options(option_text, poll_id) values ($1, $2)", [data.option_one, new_poll_id]);
+      client.query("INSERT INTO poll_options(option_text, poll_id) values ($1, $2)", [data.option_two, new_poll_id]);
+      client.query("INSERT INTO poll_options(option_text, poll_id) values ($1, $2)", [data.option_three, new_poll_id]);
+      client.query("INSERT INTO poll_options(option_text, poll_id) values ($1, $2)", [data.option_four, new_poll_id]);
+      res.redirect('/show/' + new_poll_id);
+    });
   });
 }
 
@@ -51,20 +56,20 @@ function showHandler(req, res) {
   pg.connect(connectionString, function(err, client, done) {
     if(err) throw err;
 
-    var query = client.query("SELECT * FROM polls WHERE id=$1", [req.params.id]);
+    var query = client.query("SELECT polls.question, poll_options.* FROM polls JOIN poll_options ON polls.poll_id = poll_options.poll_id WHERE polls.poll_id=$1", [req.params.poll_id]);
     
     query.on('row', function(row) {
       results.push(row);
     });
     
-    query.on('end', function() {
+    query.on('end', function(result) {
       client.end();
       res.render('show', {
-        question: results[0].question,
-        option_one: results[0].option_one,
-        option_two: results[0].option_two,
-        option_three: results[0].option_three,
-        option_four: results[0].option_four,
+        question: result.rows[0].question,
+        option_one: result.rows[0].option_text,
+        option_two: result.rows[0].option_text,
+        option_three: result.rows[0].option_text,
+        option_four: result.rows[0].option_text,
       });
     });
   });
