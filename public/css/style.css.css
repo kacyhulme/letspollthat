@@ -1,10 +1,23 @@
 body {
-  padding-top: 50px; }
+  padding-top: 50px;
+  background: -webkit-linear-gradient(#CD88AF, #661141); }
 
 .container .jumbotron {
   border-radius: 40px; }
 
+.jumbotron {
+  background-color: #e4bed3;
+  border: 2px solid #440027;
+  color: #440027; }
+
 input {
   margin: 5px 0 5px 0; }
+
+.btn {
+  background-color: #AA5585;
+  border: none; }
+
+.btn:hover {
+  background-color: #CD88AF; }
 
 /*# sourceMappingURL=style.css.css.map */

@@ -1,10 +1,24 @@
-<div>Hello!</div>
-<div><%= question %></div>
-
-<form method="update" action="/update" id="voteform">
-  <input type="radio" name="first_choice"><%= option_one %>
-  <input type="radio" name="second_choice"><%= option_two%>
-  <input type="radio" name="third_choice"><%= option_three %>
-  <input type="radio" name="fourth_choice"><%= option_four %>
-  <input id="button" type="submit" value="Vote" class="btn btn-primary btn-sm">
-</form>
+<head>
+  <meta charset="UTF-8">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.3/jquery-ui.min.js"></script>
+  <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="css/show.css.scss" type="text/css" media="screen" title="no title" charset="utf-8">  
+  <title>Let's Poll That!</title>
+</head>
+<body>
+  <div class="container">
+    <div class="jumbotron">
+      <h1>Hello!</h1>
+      <p><%= question %></p>
+      <hr>
+      <form method="post" action="/update" id="voteform">
+        <input type="radio" name="selected" value=<%= option_one_val %>><%= option_one %>
+        <input type="radio" name="selected" value=<%= option_two_val %>><%= option_two%>
+        <input type="radio" name="selected" value=<%= option_three_val %>><%= option_three %>
+        <input type="radio" name="selected" value=<%= option_four_val %>><%= option_four %>
+        <input id="button" type="submit" value="Vote" class="btn btn-primary btn-sm">
+      </form>
+    </div>
+  </div>
+</body>

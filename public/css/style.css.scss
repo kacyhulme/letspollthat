@@ -1,11 +1,30 @@
+@import 'variables';
+
 body { 
-  padding-top:50px; 
+  padding-top: 50px; 
+  background: -webkit-linear-gradient($secondary-super-light-color, $secondary-dark-color);
 }
 
 .container .jumbotron { 
   border-radius:40px; 
 }
 
+.jumbotron {
+  background-color: lighten($secondary-super-light-color, 15%);
+  border: 2px solid $secondary-super-dark-color;
+  color: $secondary-super-dark-color;
+
+}
+
 input {
   margin: 5px 0 5px 0; 
+}
+
+.btn {
+  background-color: $secondary-light-color;
+  border: none;
+}
+
+.btn:hover {  
+  background-color: $secondary-super-light-color;
 }
