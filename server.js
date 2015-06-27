@@ -26,7 +26,6 @@ app.listen(port, function() {
 });
 
 //CREATE//
-//create: $ curl --data "text=test&complete=false" http://127.0.0.1:3000/api/v1/todos
 function createHandler(req, res) {
   var results = [];
   var data = {
@@ -41,7 +40,6 @@ function createHandler(req, res) {
       console.log(err);
     }
     var query = client.query("INSERT INTO polls (question) values ($1) RETURNING poll_id", [data.question], function(err, result) {
-      console.log(result);
       var new_poll_id = result.rows[0].poll_id;
       var prepStmt = "INSERT INTO poll_options(option_text, poll_id, votes) values ($1, $2, $3)";
       client.query(prepStmt, [data.option_one, new_poll_id, 0]);
@@ -89,14 +87,6 @@ function updateHandler(req, res) {
     if(err) throw err;
     client.query("UPDATE poll_options SET votes = votes + 1 WHERE poll_option_id=($1)", [req.body.selected]);
     res.redirect('/thanks');
-    // var query = client.query("SELECT * FROM polls ORDER BY id ASC");
-    // query.on('row', function(row) {
-    //   results.push(row);
-    // });
-    // query.on('end', function() {
-    //   client.end();
-    //   return res.json(results);
-    // });
   });
 }
 
